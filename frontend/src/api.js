@@ -7,3 +7,4 @@ const API = axios.create({
 
 export const sendTask = (task) => API.post("/", { task });
 export const getLogs = () => API.get("/logs");
+export const clearLogs = () => API.delete("/logs");

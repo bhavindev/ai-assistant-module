@@ -25,6 +25,10 @@ cd frontend
 npm install
 npm start
 
+## Tests
+cd backend
+npm test
+
 ## Example Usage
 
 Input: summarize client calls
@@ -45,7 +49,7 @@ Response:
   }
 }
 
-All interactions are stored in: backend/data/logs.json
+## All interactions are stored in: backend/data/logs.json
 
 ## Notes
 
