@@ -38,16 +38,13 @@ export class AssistantService extends AssistantInterface {
     if (this.isQuestion(trimmedMessage)) {
       reply = `${this.prefix} I understand you're asking about "${trimmedMessage}". Here's a simulated response with helpful information.`;
       confidence = 0.92;
-    }
-    else if (this.containsKeywords(trimmedMessage, ['help', 'assist', 'support'])) {
+    } else if (this.containsKeywords(trimmedMessage, ['help', 'assist', 'support'])) {
       reply = `${this.prefix} I'm here to help! You mentioned: "${trimmedMessage}". How can I assist you further?`;
       confidence = 0.9;
-    }
-    else if (trimmedMessage.length < 10) {
+    } else if (trimmedMessage.length < 10) {
       reply = `${this.prefix} Your message "${trimmedMessage}" is quite brief. Could you provide more details?`;
       confidence = 0.75;
-    }
-    else {
+    } else {
       reply = `${this.prefix} Received your message: "${trimmedMessage}". Processing complete.`;
       confidence = 0.85;
     }
