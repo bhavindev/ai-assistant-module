@@ -50,6 +50,27 @@ curl -X POST http://localhost:5000/assist \
 }
 ```
 
+### `400 Validation Error Example`
+If the required message field is missing:
+```bash
+curl -X POST http://localhost:5000/assist \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+**Response:**
+```json
+{
+  "error": "ValidationError",
+  "details": [
+    {
+      "path": ["message"],
+      "message": "Required"
+    }
+  ]
+}
+```
+
 ### `GET /logs?limit=50`
 Retrieve recent interaction logs
 ```bash
