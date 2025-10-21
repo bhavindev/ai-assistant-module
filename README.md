@@ -1,56 +1,121 @@
-# 🧩 AI Assistant Module (Test 1 of 2)
+# 🚀 AI Assistant Module - Production Ready
 
-This project simulates an internal **AI assistant module** as described in the test brief.  
-It receives a short task, returns a structured simulated response, and logs all interactions in a local JSON file.
+A **production-ready AI assistant service** built with modern Node.js practices, comprehensive testing, and enterprise-grade code quality standards.
 
----
+## 🚀 Quick Start
 
-## Tech Stack
-- **Frontend:** React (simple form + log viewer)
-- **Backend:** Node.js (Express)
-- **Storage:** Local JSON file (`data/logs.json`)
-- **Extras:** Async simulation to mimic AI processing
+### **Prerequisites**
+- Node.js ≥20.11.0
+- npm ≥10.0.0
 
----
+### **Clone Project**
 
-### How to Run
+Clone URL: `git clone https://github.com/bhavindev/ai-assistant-module.git`
 
-## Frontend Setup
+### **Backend Setup**
 cd backend
 npm install
-npm start
+npm run dev
 
-## Frontend Setup
+### **Frontend Setup**
 cd frontend
 npm install
 npm start
 
-## Tests
-cd backend
-npm test
+## 🎯 Features
 
-## Example Usage
+### 🏗️ **Production Architecture**
+- **Node.js 20.11.0** with ES modules
+- **Express 4.x** with structured middleware
+- **Service-Repository pattern** for clean architecture
+- **Zod validation** with detailed error responses
+- **JSONL storage** with path traversal protection
 
-Input: summarize client calls
+## 📋 API Endpoints
 
-Response:
+### `POST /assist`
+Process an AI assistant message
+```bash
+curl -X POST http://localhost:5000/assist \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hello AI assistant", "sessionId": "optional-uuid"}'
+```
+
+**Response:**
+```json
 {
-  "task": "summarize client calls",
-  "type": "summarize",
-  "summary": "Simulated result for task \"summarize client calls\".",
-  "actionItems": [
-    "1) Understand \"summarize client calls\"",
-    "2) Produce short summary",
-    "3) (Simulated) suggested steps"
-  ],
-  "metadata": {
-    "processedAt": "2025-10-15T06:44:18.189Z",
-    "simulatedConfidence": "99%"
-  }
+  "reply": "[AI Assistant]: Received your message: \"Hello AI assistant\". Processing complete.",
+  "messageId": "550e8400-e29b-41d4-a716-446655440000",
+  "ts": "2025-10-17T11:00:00.000Z"
 }
+```
 
-## All interactions are stored in: backend/data/logs.json
+### `400 Validation Error Example`
+If the required message field is missing:
+```bash
+curl -X POST http://localhost:5000/assist \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
 
-## Notes
+**Response:**
+```json
+{
+  "error": "ValidationError",
+  "details": [
+    {
+      "path": ["message"],
+      "message": "Required"
+    }
+  ]
+}
+```
 
-This version simulates AI responses. No real AI API is integrated.
+### `GET /logs?limit=50`
+Retrieve recent interaction logs
+```bash
+curl http://localhost:5000/logs?limit=10
+```
+
+### `DELETE /logs`
+Clear all logs (development only)
+```bash
+curl -X DELETE http://localhost:5000/logs
+```
+
+### `GET /health`
+Health check with storage metrics
+```bash
+curl http://localhost:5000/health
+```
+
+### **Run Tests**
+cd backend
+npm test                 # Run all tests
+npm run test:coverage    # Generate coverage report
+npm run lint             # Check code style
+npm run format:check     # Check formatting
+
+## 🏗️ Architecture
+
+### **Project Structure**
+```
+backend/
+├── src/
+│   ├── interfaces/          # Abstract interfaces
+│   ├── services/            # Business logic
+│   ├── repositories/        # Data access layer
+│   ├── routes/              # API endpoints
+│   ├── middleware/          # Request validation
+│   └── schemas/             # Zod validation schemas
+├── tests/
+│   ├── unit/                # Unit tests
+│   └── e2e/                 # End-to-end tests
+├── data/                    # JSONL storage
+└── server.js                # Application entry point
+
+## 🔗 Links
+
+- **Repository:**: https://github.com/bhavindev/ai-assistant-module
+- **CI/CD:**: https://github.com/bhavindev/ai-assistant-module/actions
+- **Issues:**: https://github.com/bhavindev/ai-assistant-module/issues

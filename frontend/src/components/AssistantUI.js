@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { sendTask, getLogs, clearLogs } from "../api";
 
 export default function AssistantUI() {
-  const [task, setTask] = useState("");
+  const [message, setMessage] = useState("");
+  const [sessionId, setSessionId] = useState("");
   const [response, setResponse] = useState(null);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,18 +25,22 @@ export default function AssistantUI() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!task.trim()) return;
+    if (!message.trim()) return;
     setError(null);
     setLoading(true);
 
     try {
-      const res = await sendTask(task);
+      const res = await sendTask(message, sessionId || null);
       setResponse(res.data);
-      setTask("");
+      setMessage("");
       await fetchLogs();
     } catch (err) {
       console.error(err);
-      setError("Error sending task.");
+      if (err.response?.data?.error === 'ValidationError') {
+        setError(`Validation Error: ${err.response.data.details.map(d => d.message).join(', ')}`);
+      } else {
+        setError("Error sending message.");
+      }
     } finally {
       setLoading(false);
     }
@@ -44,30 +49,40 @@ export default function AssistantUI() {
   async function handleClearLogs() {
     if (!window.confirm("Are you sure you want to clear all logs?")) return;
     await clearLogs();
+    setError(null);
     setLogs([]);
   }
 
   return (
     <div style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
-      <h2 style={{ textAlign: "center" }}>Assistant Console</h2>
+      <h2 style={{ textAlign: "center" }}>AI Assistant Console</h2>
 
       <form
         onSubmit={handleSubmit}
-        style={{ display: "flex", gap: 8, marginTop: 10 }}
+        style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 10 }}
       >
+        <div style={{ display: "flex", gap: 8 }}>
+          <input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder='Enter message (max 2000 chars)'
+            style={{ flex: 1, padding: 10, fontSize: 16 }}
+            maxLength={2000}
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            style={{ padding: "10px 16px" }}
+          >
+            {loading ? "Processing..." : "Send"}
+          </button>
+        </div>
         <input
-          value={task}
-          onChange={(e) => setTask(e.target.value)}
-          placeholder='Enter task e.g. "summarize calls"'
-          style={{ flex: 1, padding: 10, fontSize: 16 }}
+          value={sessionId}
+          onChange={(e) => setSessionId(e.target.value)}
+          placeholder='Session ID (optional UUID)'
+          style={{ padding: 8, fontSize: 14 }}
         />
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ padding: "10px 16px" }}
-        >
-          {loading ? "Processing..." : "Send"}
-        </button>
       </form>
 
       {error && <div style={{ color: "red", marginTop: 10 }}>{error}</div>}
@@ -114,7 +129,7 @@ export default function AssistantUI() {
         </div>
 
         {logs.length === 0 ? (
-          <div style={{ color: "#555" }}>No logs yet. Try adding a task.</div>
+          <div style={{ color: "#555" }}>No logs yet. Try sending a message.</div>
         ) : (
           <ul style={{ listStyle: "none", padding: 0 }}>
             {logs.map((log) => (
@@ -128,14 +143,24 @@ export default function AssistantUI() {
                 }}
               >
                 <div>
-                  <strong>{log.task}</strong>{" "}
+                  <strong>{log.message}</strong>{" "}
                   <small style={{ color: "#666" }}>
                     ({new Date(log.timestamp).toLocaleString()})
                   </small>
+                  {log.sessionId && (
+                    <small style={{ color: "#999", marginLeft: 8 }}>
+                      Session: {log.sessionId.slice(0, 8)}...
+                    </small>
+                  )}
                 </div>
-                <div style={{ fontSize: 13, color: "#333" }}>
-                  {log.response?.summary}
+                <div style={{ fontSize: 13, color: "#333", marginTop: 4 }}>
+                  <strong>Reply:</strong> {log.reply}
                 </div>
+                {log.confidence && (
+                  <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>
+                    Confidence: {(log.confidence * 100).toFixed(0)}%
+                  </div>
+                )}
               </li>
             ))}
           </ul>
